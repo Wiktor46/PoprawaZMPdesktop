@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ZMPdesktop.ViewModels"
+             xmlns:v="using:ZMPdesktop.Views"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="750"
+             x:Class="ZMPdesktop.Views.MainView"
+             x:DataType="vm:MainViewModel">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Top App Bar Header -->
+        <Border Grid.Row="0" Background="#1E1E2E" Padding="16,12" BoxShadow="0 4 10 0 #101018">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- App Title & Logo -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <TextBlock Text="📚 Panel Bibliotekarza" FontSize="20" FontWeight="Bold" Foreground="#6C5CE7"/>
+                    <Border Background="#2B2B3D" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                        <TextBlock Text="Multi-Client System" FontSize="11" Foreground="#A0A0B0"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- User Info & Logout -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <TextBlock Text="{Binding LibrarianName}" FontWeight="SemiBold" Foreground="White" FontSize="14" HorizontalAlignment="Right"/>
+                        <TextBlock Text="Rola: Bibliotekarz (Admin)" FontSize="11" Foreground="#00CEC9" HorizontalAlignment="Right"/>
+                    </StackPanel>
+
+                    <Button Content="🚪 Wyloguj" 
+                            Command="{Binding LogoutCommand}" 
+                            Background="#3F3F56" 
+                            Foreground="#FF7675" 
+                            CornerRadius="6" 
+                            Height="36" 
+                            Padding="12,6"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- SignalR Live Notification Banner -->
+        <Border Grid.Row="1" 
+                Background="#6C5CE7" 
+                Padding="16,10" 
+                IsVisible="{Binding HasNotification}">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" 
+                           Text="{Binding NotificationBanner}" 
+                           Foreground="White" 
+                           FontWeight="SemiBold" 
+                           FontSize="14" 
+                           VerticalAlignment="Center"/>
+
+                <Button Grid.Column="1" 
+                        Content="✕ Zamknij" 
+                        Command="{Binding DismissNotificationCommand}" 
+                        Background="Transparent" 
+                        Foreground="White" 
+                        Padding="8,4"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Tab Control with white font styling -->
+        <TabControl Grid.Row="2" 
+                    SelectedIndex="{Binding SelectedTabIndex}" 
+                    Margin="16,12" 
+                    Background="Transparent">
+            <TabControl.Styles>
+                <Style Selector="TabItem">
+                    <Setter Property="Foreground" Value="#E0E0E0"/>
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="Padding" Value="14,10"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+                <Style Selector="TabItem:selected">
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Style>
+                <Style Selector="TabItem:pointerover">
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                </Style>
+            </TabControl.Styles>
+
+            <TabItem Header="📚 Katalog &amp; Wypożyczenia">
+                <v:BooksView DataContext="{Binding BooksVM}"/>
+            </TabItem>
+
+            <TabItem Header="📋 Wszystkie Wypożyczenia">
+                <v:LoansView DataContext="{Binding LoansVM}"/>
+            </TabItem>
+
+            <TabItem Header="👥 Czytelnicy (On-line / Off-line)">
+                <v:UsersView DataContext="{Binding UsersVM}"/>
+            </TabItem>
+
+            <TabItem Header="📌 Rezerwacje">
+                <v:ReservationsView DataContext="{Binding ReservationsVM}"/>
+            </TabItem>
+
+            <TabItem Header="⚠️ Zalegający ze Zwrotem">
+                <v:OverdueView DataContext="{Binding OverdueVM}"/>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</UserControl>

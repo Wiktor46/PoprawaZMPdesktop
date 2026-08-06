@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ZMPdesktop.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="ZMPdesktop.Views.LoginView"
+             x:DataType="vm:LoginViewModel">
+
+    <Grid Background="#1E1E2E">
+        <Border HorizontalAlignment="Center" 
+                VerticalAlignment="Center" 
+                Width="420" 
+                Padding="32" 
+                CornerRadius="16" 
+                Background="#2B2B3D" 
+                BoxShadow="0 10 30 0 #000000">
+            <StackPanel Spacing="18">
+                <!-- Header -->
+                <StackPanel HorizontalAlignment="Center" Spacing="6">
+                    <TextBlock Text="📚 Panel Bibliotekarza" 
+                               FontSize="26" 
+                               FontWeight="Bold" 
+                               Foreground="#6C5CE7" 
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="System Zarządzania Biblioteką (Multi-Client)" 
+                               FontSize="13" 
+                               Foreground="#A0A0B0" 
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <Separator Background="#3F3F56" Margin="0,4,0,4"/>
+
+                <!-- Base URL -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Adres serwera API:" Foreground="#DCDCF0" FontSize="12"/>
+                    <TextBox Text="{Binding BaseUrl}" 
+                             Watermark="http://localhost:5228" 
+                             Height="40" 
+                             CornerRadius="8"/>
+                </StackPanel>
+
+                <!-- Email -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Adres E-mail bibliotekarza:" Foreground="#DCDCF0" FontSize="12"/>
+                    <TextBox Text="{Binding Email}" 
+                             Watermark="admin@library.com" 
+                             Height="40" 
+                             CornerRadius="8"/>
+                </StackPanel>
+
+                <!-- Password -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Hasło:" Foreground="#DCDCF0" FontSize="12"/>
+                    <TextBox Text="{Binding Password}" 
+                             PasswordChar="*" 
+                             Watermark="••••••••" 
+                             Height="40" 
+                             CornerRadius="8"/>
+                </StackPanel>
+
+                <!-- Error Message -->
+                <TextBlock Text="{Binding ErrorMessage}" 
+                           Foreground="#FF7675" 
+                           FontSize="13" 
+                           TextWrapping="Wrap" 
+                           IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+                <!-- Submit Button -->
+                <Button Content="Zaloguj się do panelu" 
+                        Command="{Binding LoginCommand}" 
+                        IsEnabled="{Binding !IsBusy}"
+                        HorizontalAlignment="Stretch" 
+                        HorizontalContentAlignment="Center" 
+                        VerticalContentAlignment="Center"
+                        Height="45" 
+                        CornerRadius="8" 
+                        Background="#6C5CE7" 
+                        Foreground="White" 
+                        FontWeight="SemiBold" 
+                        FontSize="15" 
+                        Cursor="Hand"/>
+
+                <!-- Progress Ring -->
+                <ProgressBar IsIndeterminate="True" 
+                             Height="4" 
+                             IsVisible="{Binding IsBusy}" 
+                             HorizontalAlignment="Stretch"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

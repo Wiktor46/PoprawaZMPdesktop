@@ -1,0 +1,213 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ZMPdesktop.ViewModels"
+             xmlns:m="using:ZMPdesktop.Models"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="ZMPdesktop.Views.BooksView"
+             x:DataType="vm:BooksViewModel">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Toolbar -->
+        <Border Grid.Row="0" Background="#2B2B3D" Padding="16,12" CornerRadius="8" Margin="0,0,0,12">
+            <Grid ColumnDefinitions="*,Auto">
+                <!-- Search -->
+                <TextBox Grid.Column="0" 
+                         Text="{Binding SearchText}" 
+                         Watermark="🔍 Szukaj według tytułu, autora lub ISBN..." 
+                         Width="350" 
+                         HorizontalAlignment="Left" 
+                         VerticalAlignment="Center"
+                         CornerRadius="6" 
+                         Height="36"/>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Content="➕ Dodaj Książkę" 
+                            Command="{Binding OpenAddFormCommand}" 
+                            Background="#6C5CE7" Foreground="White" CornerRadius="6" Height="36" Padding="14,6"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                    
+                    <Button Content="✏️ Edytuj" 
+                            Command="{Binding OpenEditFormCommand}" 
+                            IsEnabled="{Binding SelectedBook, Converter={x:Static ObjectConverters.IsNotNull}}" 
+                            Background="#0984E3" Foreground="White" CornerRadius="6" Height="36" Padding="14,6"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+
+                    <Button Content="🗑️ Usuń" 
+                            Command="{Binding DeleteBookCommand}" 
+                            IsEnabled="{Binding SelectedBook, Converter={x:Static ObjectConverters.IsNotNull}}" 
+                            Background="#D63031" Foreground="White" CornerRadius="6" Height="36" Padding="14,6"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+
+                    <Separator Background="#3F3F56" Width="1" Margin="4,4"/>
+
+                    <Button Content="📖 Wypożycz pozycję" 
+                            Command="{Binding OpenCheckoutFormCommand}" 
+                            IsEnabled="{Binding SelectedBook.IsAvailable, FallbackValue=False}" 
+                            Background="#00B894" Foreground="White" CornerRadius="6" Height="36" Padding="14,6" FontWeight="SemiBold"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+
+                    <Button Content="↩️ Zarejestruj zwrot" 
+                            Command="{Binding ReturnBookCommand}" 
+                            IsEnabled="{Binding SelectedBook, Converter={x:Static ObjectConverters.IsNotNull}}" 
+                            Background="#E17055" Foreground="White" CornerRadius="6" Height="36" Padding="14,6"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+
+                    <Button Content="🔄 Odśwież" 
+                            Command="{Binding LoadDataCommand}" 
+                            Background="#3F3F56" Foreground="White" CornerRadius="6" Height="36" Padding="14,6"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Data Content -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+            <!-- Books List -->
+            <Border Grid.Column="0" Background="#2B2B3D" CornerRadius="8" Padding="12">
+                <ListBox ItemsSource="{Binding FilteredBooks}" 
+                         SelectedItem="{Binding SelectedBook}" 
+                         Background="Transparent">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="m:BookModel">
+                            <Border Padding="12" Margin="0,2" Background="#1E1E2E" CornerRadius="6">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Grid.Column="0" Spacing="4">
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                            <Border Background="{Binding IsAvailable, Converter={x:Static ObjectConverters.IsNotNull}}" 
+                                                    CornerRadius="4" Padding="6,2">
+                                                <TextBlock Text="{Binding StatusText}" FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Author, StringFormat='Autor: {0}'}" Foreground="#B0B0C0" FontSize="13"/>
+                                        <TextBlock Text="{Binding ISBN, StringFormat='ISBN: {0}'}" Foreground="#808090" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <!-- Borrower details if borrowed -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" IsVisible="{Binding !IsAvailable}">
+                                        <TextBlock Text="Wypożyczone przez:" FontSize="11" Foreground="#808090"/>
+                                        <TextBlock Text="{Binding ActiveLoan.Borrower.DisplayName, FallbackValue='- '}" FontWeight="SemiBold" Foreground="#00CEC9" FontSize="13"/>
+                                        <TextBlock Text="{Binding ActiveLoan.DueDate, StringFormat='Termin: {0:dd.MM.yyyy}'}" FontSize="11" Foreground="#FAB1A0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+
+            <!-- Slide-over Dialog Panel: Add / Edit Book Form -->
+            <Border Grid.Column="1" 
+                    Width="340" 
+                    Background="#2B2B3D" 
+                    CornerRadius="8" 
+                    Padding="16" 
+                    Margin="12,0,0,0" 
+                    IsVisible="{Binding IsFormVisible}">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="{Binding FormTitle}" FontSize="18" FontWeight="Bold" Foreground="#6C5CE7"/>
+                    
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Tytuł pozycji:" Foreground="#DCDCF0" FontSize="12"/>
+                        <TextBox Text="{Binding BookTitle}" CornerRadius="6" Height="36"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Autor:" Foreground="#DCDCF0" FontSize="12"/>
+                        <TextBox Text="{Binding BookAuthor}" CornerRadius="6" Height="36"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Kod ISBN:" Foreground="#DCDCF0" FontSize="12"/>
+                        <TextBox Text="{Binding BookISBN}" CornerRadius="6" Height="36"/>
+                    </StackPanel>
+
+                    <CheckBox Content="Pozycja dostępna do wypożyczenia" 
+                              IsChecked="{Binding BookIsAvailable}"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+                        <Button Content="Anuluj" Command="{Binding CancelFormCommand}" Background="#3F3F56" CornerRadius="6" Padding="12,6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <Button Content="Zapisz" Command="{Binding SaveBookCommand}" Background="#6C5CE7" Foreground="White" CornerRadius="6" FontWeight="SemiBold" Padding="12,6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Slide-over Dialog Panel: Checkout Book Form -->
+            <Border Grid.Column="1" 
+                    Width="360" 
+                    Background="#2B2B3D" 
+                    CornerRadius="8" 
+                    Padding="16" 
+                    Margin="12,0,0,0" 
+                    IsVisible="{Binding IsCheckoutFormVisible}">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="📖 Rejestracja Wypożyczenia" FontSize="18" FontWeight="Bold" Foreground="#00B894"/>
+                    
+                    <TextBlock Text="{Binding SelectedBook.Title, StringFormat='Książka: {0}'}" FontWeight="SemiBold" Foreground="White" TextWrapping="Wrap"/>
+                    
+                    <StackPanel Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Wybierz czytelnika:" Foreground="#DCDCF0" FontSize="12" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" Content="➕ Nowy Off-line" Command="{Binding OpenOfflineUserDialogCommand}" FontSize="11" Background="#3F3F56" Padding="8,4" CornerRadius="4" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        </Grid>
+                        
+                        <ComboBox ItemsSource="{Binding Users}" 
+                                  SelectedItem="{Binding SelectedUserForCheckout}" 
+                                  HorizontalAlignment="Stretch" 
+                                  Height="38" 
+                                  CornerRadius="6">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="m:UserModel">
+                                    <TextBlock Text="{Binding DisplayName}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Czas wypożyczenia (w dniach):" Foreground="#DCDCF0" FontSize="12"/>
+                        <NumericUpDown Value="{Binding CheckoutDays}" Minimum="1" Maximum="90" Height="36"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+                        <Button Content="Anuluj" Command="{Binding CancelCheckoutFormCommand}" Background="#3F3F56" CornerRadius="6" Padding="12,6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <Button Content="Zatwierdź Wypożyczenie" Command="{Binding ConfirmCheckoutCommand}" Background="#00B894" Foreground="White" CornerRadius="6" FontWeight="SemiBold" Padding="12,6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Dialog Modal: Add Offline User Quick Modal -->
+            <Border Grid.Column="1" 
+                    Width="320" 
+                    Background="#1E1E2E" 
+                    BorderBrush="#6C5CE7" 
+                    BorderThickness="1" 
+                    CornerRadius="8" 
+                    Padding="16" 
+                    Margin="12,0,0,0" 
+                    IsVisible="{Binding IsOfflineUserDialogVisible}">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="👤 Nowy Czytelnik Off-line" FontSize="16" FontWeight="Bold" Foreground="#00CEC9"/>
+                    
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Imię i Nazwisko:" Foreground="#DCDCF0" FontSize="12"/>
+                        <TextBox Text="{Binding OfflineFullName}" Watermark="np. Jan Kowalski" CornerRadius="6" Height="36"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+                        <Button Content="Anuluj" Command="{Binding CancelOfflineUserDialogCommand}" Background="#3F3F56" CornerRadius="6" Padding="12,6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                        <Button Content="Utwórz" Command="{Binding CreateOfflineUserCommand}" Background="#00CEC9" Foreground="Black" CornerRadius="6" FontWeight="Bold" Padding="12,6" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Background="#1E1E2E" Padding="12,6" Margin="0,8,0,0" CornerRadius="4">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="#A0A0B0" FontSize="12"/>
+        </Border>
+    </Grid>
+</UserControl>

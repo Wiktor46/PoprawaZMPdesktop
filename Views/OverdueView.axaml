@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ZMPdesktop.ViewModels"
+             xmlns:m="using:ZMPdesktop.Models"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+             x:Class="ZMPdesktop.Views.OverdueView"
+             x:DataType="vm:OverdueViewModel">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Header Toolbar -->
+        <Border Grid.Row="0" Background="#2B2B3D" Padding="16,12" CornerRadius="8" Margin="0,0,0,12">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="⚠️ Czytelnicy Zalegający ze Zwrotem Pozycji" FontSize="16" FontWeight="Bold" Foreground="#FF7675"/>
+                    <TextBlock Text="Lista wypożyczeń, których termin przekroczył wyznaczony czas." FontSize="12" Foreground="#A0A0B0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Content="↩️ Przyjmij zwrot książki" 
+                            Command="{Binding ProcessReturnCommand}" 
+                            IsEnabled="{Binding SelectedLoan, Converter={x:Static ObjectConverters.IsNotNull}}" 
+                            Background="#E17055" Foreground="White" CornerRadius="6" Height="36" Padding="14,6" FontWeight="SemiBold"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+
+                    <Button Content="🔄 Odśwież" 
+                            Command="{Binding LoadDataCommand}" 
+                            Background="#3F3F56" Foreground="White" CornerRadius="6" Height="36" Padding="14,6"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Overdue List -->
+        <Border Grid.Row="1" Background="#2B2B3D" CornerRadius="8" Padding="12">
+            <ListBox ItemsSource="{Binding OverdueLoans}" 
+                     SelectedItem="{Binding SelectedLoan}" 
+                     Background="Transparent">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="m:LoanModel">
+                        <Border Padding="12" Margin="0,2" Background="#1E1E2E" CornerRadius="6" BorderBrush="#D63031" BorderThickness="1">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" Spacing="4">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="{Binding Book.Title, FallbackValue='Książka'}" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                                        <Border CornerRadius="4" Padding="6,2" Background="#D63031">
+                                            <TextBlock Text="{Binding DaysOverdue, StringFormat='Zaległość: {0} dni'}" FontSize="12" FontWeight="Bold" Foreground="White"/>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <TextBlock Text="{Binding Borrower.DisplayName, StringFormat='Czytelnik zalegający: {0}'}" Foreground="#FF7675" FontSize="14" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Book.Author, StringFormat='Autor: {0}'}" Foreground="#B0B0C0" FontSize="12"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="2">
+                                    <TextBlock Text="{Binding DueDate, StringFormat='Upłynął dnia: {0:dd.MM.yyyy}'}" FontSize="12" FontWeight="Bold" Foreground="#FAB1A0" HorizontalAlignment="Right"/>
+                                    <TextBlock Text="{Binding BorrowedAt, StringFormat='Data wypożyczenia: {0:dd.MM.yyyy}'}" FontSize="11" Foreground="#808090" HorizontalAlignment="Right"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Background="#1E1E2E" Padding="12,6" Margin="0,8,0,0" CornerRadius="4">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="#A0A0B0" FontSize="12"/>
+        </Border>
+    </Grid>
+</UserControl>
