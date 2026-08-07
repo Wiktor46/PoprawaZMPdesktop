@@ -43,17 +43,8 @@
 
                     <Separator Background="#3F3F56" Width="1" Margin="4,4"/>
 
-                    <Button Content="📖 Wypożycz pozycję" 
-                            Command="{Binding OpenCheckoutFormCommand}" 
-                            IsEnabled="{Binding SelectedBook.IsAvailable, FallbackValue=False}" 
-                            Background="#00B894" Foreground="White" CornerRadius="6" Height="36" Padding="14,6" FontWeight="SemiBold"
-                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-
-                    <Button Content="↩️ Zarejestruj zwrot" 
-                            Command="{Binding ReturnBookCommand}" 
-                            IsEnabled="{Binding SelectedBook, Converter={x:Static ObjectConverters.IsNotNull}}" 
-                            Background="#E17055" Foreground="White" CornerRadius="6" Height="36" Padding="14,6"
-                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+              
+               
 
                     <Button Content="🔄 Odśwież" 
                             Command="{Binding LoadDataCommand}" 

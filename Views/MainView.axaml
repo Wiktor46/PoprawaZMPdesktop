@@ -87,15 +87,15 @@
                 </Style>
             </TabControl.Styles>
 
-            <TabItem Header="📚 Katalog &amp; Wypożyczenia">
+            <TabItem Header="📚 Katalog Pozycji">
                 <v:BooksView DataContext="{Binding BooksVM}"/>
             </TabItem>
 
-            <TabItem Header="📋 Wszystkie Wypożyczenia">
+            <TabItem Header="📋  Wypożyczenia">
                 <v:LoansView DataContext="{Binding LoansVM}"/>
             </TabItem>
 
-            <TabItem Header="👥 Czytelnicy (On-line / Off-line)">
+            <TabItem Header="👥 Czytelnicy">
                 <v:UsersView DataContext="{Binding UsersVM}"/>
             </TabItem>
 

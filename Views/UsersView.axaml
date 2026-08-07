@@ -82,13 +82,13 @@
                     <TextBlock Text="👤 Rejestracja Czytelnika Off-line" FontSize="17" FontWeight="Bold" Foreground="#6C5CE7"/>
                     
                     <StackPanel Spacing="4">
-                        <TextBlock Text="Imię i Nazwisko czytelnika:" Foreground="#DCDCF0" FontSize="12"/>
-                        <TextBox Text="{Binding NewFullName}" Watermark="Jan Kowalski" CornerRadius="6" Height="36"/>
+                        <TextBlock Text="Imię i Nazwisko:" Foreground="#DCDCF0" FontSize="12"/>
+                        <TextBox Text="{Binding NewFullName}" Watermark="" CornerRadius="6" Height="36"/>
                     </StackPanel>
 
                     <StackPanel Spacing="4">
-                        <TextBlock Text="Opcjonalny adres E-mail / kontakt:" Foreground="#DCDCF0" FontSize="12"/>
-                        <TextBox Text="{Binding NewEmail}" Watermark="kowalski@przyklad.pl (opcjonalnie)" CornerRadius="6" Height="36"/>
+                        <TextBlock Text="Adres E-mail / nr telefonu:" Foreground="#DCDCF0" FontSize="12"/>
+                        <TextBox Text="{Binding NewEmail}" Watermark="" CornerRadius="6" Height="36"/>
                     </StackPanel>
 
                     <TextBlock Text="Czytelnik off-line wypożycza pozycje wyłącznie na miejscu w bibliotece bez rejestracji konta internetowego." 

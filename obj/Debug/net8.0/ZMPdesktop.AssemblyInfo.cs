@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ZMPdesktop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c14fc8508d7a82c0a8584cb1d6d3c734f1b3287f")]
 [assembly: System.Reflection.AssemblyProductAttribute("ZMPdesktop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ZMPdesktop")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -81,3 +81,4 @@
 /home/kompotur/RiderProjects/ZMPdesktop/obj/Debug/net8.0/ZMPdesktop.csproj.Up2Date
 /home/kompotur/RiderProjects/ZMPdesktop/obj/Debug/net8.0/ZMPdesktop.genruntimeconfig.cache
 /home/kompotur/RiderProjects/ZMPdesktop/obj/Debug/net8.0/ref/ZMPdesktop.dll
+/home/kompotur/RiderProjects/ZMPdesktop/obj/Debug/net8.0/ZMPdesktop.sourcelink.json
