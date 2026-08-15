@@ -17,17 +17,35 @@ public partial class MainWindowViewModel : ViewModelBase
         _signalRService = new SignalRService();
 
         _currentView = new LoginViewModel(_apiService, OnLoginSuccess);
+        _apiService.OnSessionExpired += HandleSessionExpired;
     }
 
     private void OnLoginSuccess()
     {
-        var mainVM = new MainViewModel(_apiService, _signalRService, OnLogout);
-        CurrentView = mainVM;
-        _ = mainVM.RefreshCurrentTabAsync();
+        var mainVm = new MainViewModel(_apiService, _signalRService, OnLogout);
+        CurrentView = mainVm;
+        _ = mainVm.RefreshCurrentTabAsync();
     }
 
     private void OnLogout()
     {
         CurrentView = new LoginViewModel(_apiService, OnLoginSuccess);
+    }
+    
+    private void HandleSessionExpired()
+    {
+        Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            await _signalRService.DisconnectAsync();
+            _apiService.Logout(); 
+            
+            var loginVm = new LoginViewModel(_apiService, OnLoginSuccess)
+            {
+                ErrorMessage = "⏰ Sesja wygasła (token JWT stracił ważność). Zaloguj się ponownie."
+            };
+            
+            
+            CurrentView = loginVm;
+        });
     }
 }

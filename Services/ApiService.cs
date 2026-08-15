@@ -1,19 +1,51 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using ZMPdesktop.Models;
 
 namespace ZMPdesktop.Services;
 
+// ---------------------------------------------------
+// 1. KLASA PRZECHWYTUJĄCA ŻĄDANIA HTTP (INTERCEPTOR)
+// ---------------------------------------------------
+public class UnauthorizedHandler : DelegatingHandler
+{
+    public event Action? TokenExpired;
+
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var response = await base.SendAsync(request, cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            if (request.RequestUri != null && !request.RequestUri.AbsolutePath.Contains("/api/auth/login"))
+            {
+                TokenExpired?.Invoke();
+            }
+        }
+
+        return response;
+    }
+}
+
+// ---------------------------------------------------
+// 2. GŁÓWNY SERWIS API
+// ---------------------------------------------------
 public class ApiService
 {
     private readonly HttpClient _httpClient;
     private string _baseUrl = "http://localhost:5228";
     private string? _token;
+    private Timer? _expirationTimer;
+
+    public event Action? OnSessionExpired;
 
     public string BaseUrl
     {
@@ -27,20 +59,77 @@ public class ApiService
 
     public ApiService()
     {
-        _httpClient = new HttpClient();
+        var unauthorizedHandler = new UnauthorizedHandler
+        {
+            InnerHandler = new HttpClientHandler()
+        };
+        
+        unauthorizedHandler.TokenExpired += () => OnSessionExpired?.Invoke();
+
+        _httpClient = new HttpClient(unauthorizedHandler);
     }
 
     public void SetAuthToken(string? token)
     {
         _token = token;
+        _expirationTimer?.Dispose();
+        _expirationTimer = null;
+
         if (!string.IsNullOrEmpty(token))
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ScheduleTokenExpirationTimer(token);
         }
         else
         {
             _httpClient.DefaultRequestHeaders.Authorization = null;
         }
+    }
+
+    private void ScheduleTokenExpirationTimer(string token)
+    {
+        try
+        {
+            var parts = token.Split('.');
+            if (parts.Length == 3)
+            {
+                var payloadJson = DecodeBase64Url(parts[1]);
+                using var doc = JsonDocument.Parse(payloadJson);
+                if (doc.RootElement.TryGetProperty("exp", out var expElement))
+                {
+                    long expSeconds = expElement.GetInt64();
+                    var expTime = DateTimeOffset.FromUnixTimeSeconds(expSeconds);
+                    var remaining = expTime - DateTimeOffset.UtcNow;
+
+                    if (remaining <= TimeSpan.Zero)
+                    {
+                        OnSessionExpired?.Invoke();
+                    }
+                    else
+                    {
+                        _expirationTimer = new Timer(_ =>
+                        {
+                            OnSessionExpired?.Invoke();
+                        }, null, remaining, Timeout.InfiniteTimeSpan);
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Baseline fallback to 401 interceptor
+        }
+    }
+
+    private static string DecodeBase64Url(string base64Url)
+    {
+        string base64 = base64Url.Replace('-', '+').Replace('_', '/');
+        switch (base64.Length % 4)
+        {
+            case 2: base64 += "=="; break;
+            case 3: base64 += "="; break;
+        }
+        return Encoding.UTF8.GetString(Convert.FromBase64String(base64));
     }
 
     public async Task<(bool Success, string? ErrorMessage)> LoginAsync(string email, string password)
@@ -64,7 +153,7 @@ public class ApiService
                 }
             }
 
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 return (false, "Nieprawidłowy e-mail lub hasło.");
             }
@@ -79,6 +168,8 @@ public class ApiService
 
     public void Logout()
     {
+        _expirationTimer?.Dispose();
+        _expirationTimer = null;
         _token = null;
         CurrentUser = null;
         _httpClient.DefaultRequestHeaders.Authorization = null;

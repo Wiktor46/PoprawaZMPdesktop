@@ -12,10 +12,9 @@ public partial class LoginViewModel : ViewModelBase
     private readonly Action _onLoginSuccess;
 
     [ObservableProperty]
-    private string _email = "admin@library.com";
+    private string _email = string.Empty; // Usunięto domyślny e-mail
 
-    [ObservableProperty]
-    private string _password = "Admin123!";
+    // USUNIĘTO właściwość _password
 
     [ObservableProperty]
     private string _baseUrl = "http://localhost:5228";
@@ -32,11 +31,13 @@ public partial class LoginViewModel : ViewModelBase
         _onLoginSuccess = onLoginSuccess;
     }
 
+    // Dodano parametr 'password' przekazywany z widoku
     [RelayCommand]
-    private async Task LoginAsync()
+    private async Task LoginAsync(string? password) 
     {
         ErrorMessage = string.Empty;
-        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+        
+        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(password))
         {
             ErrorMessage = "Proszę podać adres e-mail oraz hasło.";
             return;
@@ -46,7 +47,7 @@ public partial class LoginViewModel : ViewModelBase
         try
         {
             _apiService.BaseUrl = BaseUrl;
-            var (success, errorMessage) = await _apiService.LoginAsync(Email, Password);
+            var (success, errorMessage) = await _apiService.LoginAsync(Email, password);
 
             if (success)
             {

@@ -52,9 +52,8 @@
                 <!-- Password -->
                 <StackPanel Spacing="4">
                     <TextBlock Text="Hasło:" Foreground="#DCDCF0" FontSize="12"/>
-                    <TextBox Text="{Binding Password}" 
+                    <TextBox x:Name="PasswordBox" 
                              PasswordChar="*" 
-                             Watermark="••••••••" 
                              Height="40" 
                              CornerRadius="8"/>
                 </StackPanel>
@@ -69,6 +68,7 @@
                 <!-- Submit Button -->
                 <Button Content="Zaloguj się do panelu" 
                         Command="{Binding LoginCommand}" 
+                        CommandParameter="{Binding #PasswordBox.Text}"
                         IsEnabled="{Binding !IsBusy}"
                         HorizontalAlignment="Stretch" 
                         HorizontalContentAlignment="Center" 

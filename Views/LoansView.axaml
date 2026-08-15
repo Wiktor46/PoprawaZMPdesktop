@@ -11,10 +11,20 @@
     <Grid RowDefinitions="Auto,*,Auto">
         <!-- Header Toolbar -->
         <Border Grid.Row="0" Background="#2B2B3D" Padding="16,12" CornerRadius="8" Margin="0,0,0,12">
-            <Grid ColumnDefinitions="Auto,*,Auto">
-                <!-- Filter Tabs -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <TextBlock Text="Filtruj wypożyczenia:" Foreground="#A0A0B0" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                <!-- Search Input -->
+                <TextBox Grid.Column="0" 
+                         Text="{Binding SearchText}" 
+                         Watermark="🔍 Szukaj czytelnika, tytułu lub autora..." 
+                         Width="320" 
+                         Height="36" 
+                         CornerRadius="6" 
+                         VerticalAlignment="Center"
+                         Margin="0,0,12,0"/>
+
+                <!-- Filter Combo -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <TextBlock Text="Stan:" Foreground="#A0A0B0" VerticalAlignment="Center" Margin="0,0,4,0"/>
                     <ComboBox SelectedIndex="{Binding FilterIndex}" Width="160" Height="36" CornerRadius="6" VerticalAlignment="Center">
                         <ComboBoxItem Content="Wszystkie"/>
                         <ComboBoxItem Content="Tylko Aktywne"/>
@@ -23,7 +33,7 @@
                 </StackPanel>
 
                 <!-- Actions -->
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <Button Content="↩️ Zarejestruj Zwrot" 
                             Command="{Binding ReturnBookCommand}" 
                             IsEnabled="{Binding SelectedLoan, Converter={x:Static ObjectConverters.IsNotNull}}" 
@@ -40,7 +50,7 @@
 
         <!-- List -->
         <Border Grid.Row="1" Background="#2B2B3D" CornerRadius="8" Padding="12">
-            <ListBox ItemsSource="{Binding Loans}" 
+            <ListBox ItemsSource="{Binding FilteredLoans}" 
                      SelectedItem="{Binding SelectedLoan}" 
                      Background="Transparent">
                 <ListBox.ItemTemplate>

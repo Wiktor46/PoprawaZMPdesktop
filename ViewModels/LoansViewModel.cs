@@ -17,7 +17,13 @@ public partial class LoansViewModel : ViewModelBase
     private ObservableCollection<LoanModel> _loans = new();
 
     [ObservableProperty]
+    private ObservableCollection<LoanModel> _filteredLoans = new();
+
+    [ObservableProperty]
     private LoanModel? _selectedLoan;
+
+    [ObservableProperty]
+    private string _searchText = string.Empty;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -33,9 +39,30 @@ public partial class LoansViewModel : ViewModelBase
         _apiService = apiService;
     }
 
+    partial void OnSearchTextChanged(string value)
+    {
+        FilterLoans();
+    }
+
     partial void OnFilterIndexChanged(int value)
     {
         _ = LoadDataAsync();
+    }
+
+    private void FilterLoans()
+    {
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            FilteredLoans = new ObservableCollection<LoanModel>(Loans);
+        }
+        else
+        {
+            var query = SearchText.Trim().ToLower();
+            var filtered = Loans.Where(l => 
+                (l.Book != null && (l.Book.Title.ToLower().Contains(query) || l.Book.Author.ToLower().Contains(query) || l.Book.ISBN.ToLower().Contains(query))) ||
+                (l.Borrower != null && ((l.Borrower.FullName ?? "").ToLower().Contains(query) || l.Borrower.Email.ToLower().Contains(query))));
+            FilteredLoans = new ObservableCollection<LoanModel>(filtered);
+        }
     }
 
     [RelayCommand]
@@ -54,7 +81,8 @@ public partial class LoansViewModel : ViewModelBase
 
             var list = await _apiService.GetLoansAsync(active: activeFilter);
             Loans = new ObservableCollection<LoanModel>(list);
-            StatusMessage = $"Wczytano {Loans.Count} wypożyczeń.";
+            FilterLoans();
+            StatusMessage = $"Wczytano {FilteredLoans.Count} wypożyczeń.";
         }
         catch (Exception ex)
         {
