@@ -8,7 +8,8 @@ using ZMPdesktop.Services;
 
 namespace ZMPdesktop.ViewModels;
 
-public partial class MainViewModel : ViewModelBase
+public partial class 
+    MainViewModel : ViewModelBase
 {
     private readonly ApiService _apiService;
     private readonly SignalRService _signalRService;
