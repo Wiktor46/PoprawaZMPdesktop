@@ -41,7 +41,7 @@ public class UnauthorizedHandler : DelegatingHandler
 public class ApiService
 {
     private readonly HttpClient _httpClient;
-    private string _baseUrl = "http://localhost:5228";
+    private string _baseUrl = "https://poprawazmpsem6-api.onrender.com";
     private string? _token;
     private Timer? _expirationTimer;
 
@@ -67,6 +67,11 @@ public class ApiService
         unauthorizedHandler.TokenExpired += () => OnSessionExpired?.Invoke();
 
         _httpClient = new HttpClient(unauthorizedHandler);
+    }
+
+    public ApiService(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
     }
 
     public void SetAuthToken(string? token)

@@ -64,7 +64,7 @@ public partial class
         NotificationBanner = $"Powiadomienie z systemu: {message}";
         HasNotification = true;
 
-        // Auto-refresh active tab data
+        // Auto-refrehing 
         Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(async () =>
         {
             await RefreshCurrentTabAsync();

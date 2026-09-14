@@ -8,20 +8,22 @@
              x:DataType="vm:LoginViewModel">
 
     <Grid Background="#1E1E2E">
+        <!-- Main Card Container -->
         <Border HorizontalAlignment="Center" 
                 VerticalAlignment="Center" 
                 Width="420" 
-                Padding="32" 
-                CornerRadius="16" 
                 Background="#2B2B3D" 
-                BoxShadow="0 10 30 0 #000000">
-            <StackPanel Spacing="18">
+                CornerRadius="16" 
+                Padding="32" 
+                BoxShadow="0 8 24 0 #33000000">
+            
+            <StackPanel Spacing="20">
                 <!-- Header -->
-                <StackPanel HorizontalAlignment="Center" Spacing="6">
-                    <TextBlock Text="📚 Panel Bibliotekarza" 
-                               FontSize="26" 
+                <StackPanel Spacing="6" HorizontalAlignment="Center">
+                    <TextBlock Text="📖 Panel Bibliotekarza" 
+                               FontSize="22" 
                                FontWeight="Bold" 
-                               Foreground="#6C5CE7" 
+                               Foreground="White" 
                                HorizontalAlignment="Center"/>
                     <TextBlock Text="System Zarządzania Biblioteką (Multi-Client)" 
                                FontSize="13" 
@@ -30,15 +32,6 @@
                 </StackPanel>
 
                 <Separator Background="#3F3F56" Margin="0,4,0,4"/>
-
-                <!-- Base URL -->
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Adres serwera API:" Foreground="#DCDCF0" FontSize="12"/>
-                    <TextBox Text="{Binding BaseUrl}" 
-                             Watermark="http://localhost:5228" 
-                             Height="40" 
-                             CornerRadius="8"/>
-                </StackPanel>
 
                 <!-- Email -->
                 <StackPanel Spacing="4">
@@ -58,34 +51,40 @@
                              CornerRadius="8"/>
                 </StackPanel>
 
-                <!-- Error Message -->
-                <TextBlock Text="{Binding ErrorMessage}" 
-                           Foreground="#FF7675" 
-                           FontSize="13" 
-                           TextWrapping="Wrap" 
-                           IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                <!-- Error Alert -->
+                <Border Background="#4A1E24" 
+                        BorderBrush="#E74C3C" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="12" 
+                        IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Text="{Binding ErrorMessage}" 
+                               Foreground="#FFB3B3" 
+                               FontSize="12" 
+                               TextWrapping="Wrap"/>
+                </Border>
 
-                <!-- Submit Button -->
-                <Button Content="Zaloguj się do panelu" 
+                <!-- Login Button -->
+                <Button Content="{Binding IsBusy, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue='Zaloguj do panelu'}"
                         Command="{Binding LoginCommand}" 
                         CommandParameter="{Binding #PasswordBox.Text}"
                         IsEnabled="{Binding !IsBusy}"
-                        HorizontalAlignment="Stretch" 
-                        HorizontalContentAlignment="Center" 
-                        VerticalContentAlignment="Center"
-                        Height="45" 
-                        CornerRadius="8" 
                         Background="#6C5CE7" 
                         Foreground="White" 
                         FontWeight="SemiBold" 
-                        FontSize="15" 
-                        Cursor="Hand"/>
+                        Height="44" 
+                        CornerRadius="8" 
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Margin="0,8,0,0"/>
 
-                <!-- Progress Ring -->
-                <ProgressBar IsIndeterminate="True" 
-                             Height="4" 
-                             IsVisible="{Binding IsBusy}" 
-                             HorizontalAlignment="Stretch"/>
+                <!-- Footer Hint -->
+                <TextBlock Text="Domyślne konto: admin@library.com" 
+                           FontSize="11" 
+                           Foreground="#707085" 
+                           HorizontalAlignment="Center" 
+                           Margin="0,4,0,0"/>
             </StackPanel>
         </Border>
     </Grid>
